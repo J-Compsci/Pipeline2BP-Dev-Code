@@ -2,10 +2,10 @@ import * as React from 'react';
 import DisplayCards from '../components/DisplayCards';
 import './routes.css';
 
-function SurveyorPage(props) {
+export default function SurveyorPage(props) {
     const results = props.drawers;
-    const surveyors = {}
-    //default hardcoded Surveyor sample array for website
+    const surveyors = {};
+    
     Object.entries(results).forEach(([cat, obj])=>(
         Object.entries(obj).forEach(([date, dObj])=>(
             Object.entries(dObj).forEach(([time, tObj])=>(
@@ -63,4 +63,3 @@ function SurveyorPage(props) {
         </div>
     );
 }
-export default SurveyorPage;

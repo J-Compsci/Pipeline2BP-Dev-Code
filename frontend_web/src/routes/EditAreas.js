@@ -63,7 +63,6 @@ export default function EditAreas(){
         }
     }
 
-
     return (
         <div id='editAreas'>
             <Card id='editAreaCard'>

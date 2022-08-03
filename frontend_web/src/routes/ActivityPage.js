@@ -9,7 +9,6 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import * as XLSX from 'xlsx/xlsx.mjs';
-
 import './routes.css';
 import ActivityTable from '../components/ActivityTable';
 import ActivityForm from '../components/ActivityForm';
@@ -17,7 +16,6 @@ import { testNames } from '../functions/HelperFunctions';
 
 function ActivityPage(props) {
     const drawers = props.drawers;
-    //console.log(props.drawers);
 
     const exportData = (e) => {
         var workbook = XLSX.utils.book_new();
@@ -77,7 +75,6 @@ function ActivityPage(props) {
                                 }
                             })
                         }
-                        // console.log(arr);
                     })
                 })
             })
