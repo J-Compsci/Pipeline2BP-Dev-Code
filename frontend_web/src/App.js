@@ -8,7 +8,7 @@ import Title from './routes/Title';
 import Projects from './routes/Projects';
 import NewProject from './routes/NewProject';
 import NewUser from './routes/NewUser';
-import SettingsPage from './routes/SettingsPage';
+import AccountPage from './routes/AccountPage';
 import EditProject from './routes/EditProject';
 import ProjectPage from './routes/ProjectPage';
 import NewProjectPoints from './routes/PointsNewProject';
@@ -23,12 +23,11 @@ import EditAreaMap from './routes/EditAreaMap';
 import EditPointMap from './routes/EditPointMap';
 import FAQ from './routes/FAQ';
 
-function App() {
-    // !! token/storage of choice, verification of choice
-    const [token, setToken] = React.useState();
+export default function App() {
+    // token is currently stored in app state
+    const [token, setToken] = React.useState(sessionStorage.userToken ? JSON.parse(sessionStorage.userToken) : null);
 
     // true == active user (logged in)
-    // check token in place with more persistant storage
     const [state, setState] = React.useState(token && token !== {} ? true : false);
     
     // Set user vars to access the user home page
@@ -36,12 +35,19 @@ function App() {
         // Will be used to block users from user pages unless logged in
         setState(active);
         setToken(token);
+        sessionStorage.setItem('userToken', JSON.stringify(token));
+    }
+
+    function updateToken(token){
+        setToken(token);
+        sessionStorage.setItem('userToken', JSON.stringify(token));
     }
 
     // clear all fields on logout
     function handleOnLogout(active) {
         setState(active);
         setToken();
+        sessionStorage.clear();
     }
 
     function TeamPages(){
@@ -83,12 +89,12 @@ function App() {
                     <Routes>
                         <Route index element={ <Home /> }/>
                         <Route path='teams/:id/*' element={ <TeamPages /> } />
-                        <Route path='settings' element={ <SettingsPage /> } />
+                        <Route path='account' element={<AccountPage updateToken={updateToken} /> } />
                         <Route path='new' element={ <NewTeamForm /> } />
-                        <Route path='edit/:id' element={ <EditTeam /> } />
+                        <Route path='edit/:id' element={<EditTeam updateToken={updateToken} /> } />
                     </Routes> 
                 : 
-                    <Navigate to="/" replace /> 
+                    <Navigate to='/' replace /> 
                 }
             </div>
         );
@@ -105,11 +111,9 @@ function App() {
                 <Route path='forgot_password' element={ <ForgotPassword/> } />
                 <Route path='password_reset/:id/:token' element={<ResetPassword/>} exact/>
                 <Route path='faq' element={<FAQ />} />
-                <Route path="*" element={<Navigate to="/" replace />}
+                <Route path='*' element={<Navigate to='/' replace />}
                 />
             </Routes>
         </Router>
     );
 }
-
-export default App;

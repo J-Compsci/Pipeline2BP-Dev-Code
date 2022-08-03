@@ -6,14 +6,14 @@ function NewArea() {
     //recieves location data from NewProject.js
     const loc = useLocation();
 
-    const [values, setValues] = React.useState({
+    const values = {
         center: loc.state.center,
         title: loc.state.title, 
         zoom: loc.state.zoom
-    });
+    };
 
     return (
-        <div id='newArea'>
+        <div id='newArea' className='pages'>
             {/* Empty New Project page, Google map component w/ searchable locations for new projects */}
             <Map center={ values.center } title={ values.title } type={ 4 } zoom={ values.zoom } />
         </div>

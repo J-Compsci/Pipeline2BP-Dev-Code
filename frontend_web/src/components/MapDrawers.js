@@ -87,7 +87,6 @@ export default function MapDrawer(props) {
             var newEntry;
             newSelections[`${category}.${date}.${time}`] = drawers.Results[category][date][time];
             setSelections(newSelections);
-            //console.log(`${category}.${date}.${time}`);
             switch (category) {
                 case 'stationary_maps':
                     newEntry = stationary;
@@ -277,6 +276,11 @@ export default function MapDrawer(props) {
             { Object.keys(sound)?.length > 1 ? <Charts selection='sound_maps.Group' data={sound} type={1} projArea={area} /> : null }
         </>
     );
+
+    /* Drawers use objects and are setting the keys as menu values (i.e. date/time).
+        Change the references for the menu titles or restructure the objects if drawer data
+        is changed to sort/list items by name instead of date a time
+    */
 
     return (
         <div id='projectFrame'>

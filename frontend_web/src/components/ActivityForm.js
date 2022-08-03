@@ -4,7 +4,17 @@ import Button from '@mui/material/Button';
 import { Form } from 'react-bootstrap';
 import AddIcon from '@mui/icons-material/Add';
 
-function ActivityForm(props) {
+const testNames = [
+    { label: 'People in Place', type: 'stationary_maps' },
+    { label: 'People in Motion', type: 'moving_maps' },
+    { label: 'Absence of Order Locator', type: 'order_maps' },
+    { label: 'Spatial Boundaries', type: 'boundaries_maps' },
+    { label: 'Lighting Profile', type: 'light_maps' },
+    { label: 'Nature Prevalence', type: 'nature_maps' },
+    { label: 'Acoustical Profile', type: 'sound_maps' },
+];
+
+export default function ActivityForm(props) {
     const loc = useLocation();
     const [form, setForm] = React.useState(
         {
@@ -19,6 +29,7 @@ function ActivityForm(props) {
         setForm({ ...form, [key]: e.target.value });
     };
 
+    // Form info is sent to NewActivityTimes.js for time slots
     return(
         <div id='ActivityForm'>
             <div className='form-group'>
@@ -43,7 +54,7 @@ function ActivityForm(props) {
                 <Form.Control type='date' className='dateTimePickers' value={form.date} onChange={handleChange('date')} />
             </div>
             <div className='form-group'>
-                <Form.Label>Time per Location</Form.Label>
+                <Form.Label>Time per Location (minutes)</Form.Label>
                 <Form.Control type='number' id='timerSelect' name='timerSelect' className='dateTimePickers' value={form.timer} min='5' max='100' onChange={handleChange('timer')} />
             </div>
             <Button className='newHoveringButtons confirm' id='addButton' component={ Link }
@@ -55,15 +66,3 @@ function ActivityForm(props) {
         </div>
     );
 }
-
-const testNames = [
-    { label: 'People in Place', type: 'stationary_maps' },
-    { label: 'People in Motion', type: 'moving_maps' },
-    { label: 'Absence of Order Locator', type: 'order_maps' },
-    { label: 'Spatial Boundaries', type: 'boundaries_maps' },
-    { label: 'Lighting Profile', type: 'light_maps' },
-    { label: 'Nature Prevalence', type: 'nature_maps' },
-    { label: 'Acoustical Profile', type: 'sound_maps' },
-];
-
-export default ActivityForm;

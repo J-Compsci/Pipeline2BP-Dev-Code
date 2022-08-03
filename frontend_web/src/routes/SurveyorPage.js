@@ -3,9 +3,10 @@ import DisplayCards from '../components/DisplayCards';
 import './routes.css';
 
 export default function SurveyorPage(props) {
+    // Props from ProjectPage.js
     const results = props.drawers;
     const surveyors = {};
-    
+
     Object.entries(results).forEach(([cat, obj])=>(
         Object.entries(obj).forEach(([date, dObj])=>(
             Object.entries(dObj).forEach(([time, tObj])=>(
@@ -15,44 +16,45 @@ export default function SurveyorPage(props) {
                         surveyors[researcher._id].name = `${researcher.firstname} ${researcher.lastname}`;
                         surveyors[researcher._id].activities = [];
                     }
-                    surveyors[researcher._id].activities.push({activity: cat, date: date, time: time});
+                    surveyors[researcher._id].activities.push({activity: cat, date: date, time: time, id: tObj._id});
                 })
             ))
         ))
     ))
 
-    const sampleS = [
-        {
+    /* organized by id in case of common names
+    ex: surveyors = {
+        'idnumber' : {
             name: 'John Smith',
             activities: [
                 {
-                    activity: 'Boundary',
+                    activity: 'nature_maps',
                     date: '2/2/22',
                     time: '2pm'
                 },
                 {
-                    activity: 'Lighting',
+                    activity: 'sound_maps',
                     date: '3/1/22',
                     time: '4pm'
                 }
             ]
         },
-        {
+        'idnumber2': {
             name: 'Anne Doe',
             activities: [
                 {
-                    activity: 'Boundary',
+                    activity: 'boundaries_maps',
                     date: '2/2/22',
                     time: '12pm'
                 },
                 {
-                    activity: 'Lighting',
+                    activity: 'light_maps',
                     date: '3/1/22',
                     time: '10am'
                 }
             ]
         }
-    ];
+    ]; */
 
     return(
         <div id='SurveyorPage'>

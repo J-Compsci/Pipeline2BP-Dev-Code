@@ -10,11 +10,11 @@ import { Link } from 'react-router-dom';
 import { testNames } from '../functions/HelperFunctions';
 import '../routes/routes.css';
 
-function DisplayCards(props) {
+export default function DisplayCards(props) {
     //Surveyor Cards have surveyor name in header
     const surveyorCards = (surveyors) => (
         Object.values(surveyors).map((surveyor, index) => (
-            <Card key={ 's' + index } className='displayCard'>
+            <Card key={ 's' + index } className='displayCard' style={{display: 'block'}}>
                 <CardHeader title={ surveyor.name } />
                 { surveyorActivities(surveyor.activities) }
             </Card>
@@ -23,7 +23,7 @@ function DisplayCards(props) {
 
     //Activity renders in the body
     const surveyorActivities = (activities) => (
-        <CardContent>
+        <CardContent style={{display: 'flex', flexDirection: 'column', justifyContent:'space-evenly', width: '100%'}}>
             { activities.map((activity, index) => (
                 <div key={ 'a' + index } className='cardRow'>
                     <Typography variant='text' component='div'>
@@ -85,8 +85,5 @@ function DisplayCards(props) {
                     {teamCards(props.teams)}
                 </div>
             )
-        
     );
-
 }
-export default DisplayCards;

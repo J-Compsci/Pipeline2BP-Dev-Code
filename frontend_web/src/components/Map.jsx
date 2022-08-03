@@ -21,15 +21,15 @@ const render = (status) => {
     // 3 - new project points
     // 4 - new project area
     // 5 - new project map
-    // 6 - edit existing area
-    // 7 -  edit existing point
+    // 6 - edit existing area/add area
+    // 7 -  edit existing point/add point
 
 export default function FullMap(props) {
     const [map, setMap] = React.useState(null);
     const [mapPlaces, setMapPlaces] = React.useState(null);
     const [placeOn, setPlaceOn] = React.useState(false);
     const [title, setTitle] = React.useState(props.type > 0 ? props.title : null);
-    const [zoom, setZoom] = React.useState(props.zoom ? props.zoom : 11); // initial zoom
+    const [zoom, setZoom] = React.useState(props.zoom ? props.zoom : 16); // initial zoom
     const [center, setCenter] = React.useState(props.center ? props.center : { lat:28.54023216523664, lng:-81.38181298263407 });
     const [bounds, setBounds] = React.useState();
     const [click, setClick] = React.useState(props.type === 0 || props.type === 2 || props.type === 7 ? props.center : null);
@@ -38,10 +38,10 @@ export default function FullMap(props) {
     const [clicks, setClicks] = React.useState(props.type === 5 ? props.points : (props.type === 3 ? [] :(props.type === 6 ? props.area : [])));
     const standingPoints = props.standingPoints ? props.standingPoints : null;
     const subAreas = props.subAreas ? props.subAreas : [];
+    // Access Universal Data passed around including the key for maps
     const loc = useLocation();
-    //console.log(loc?.state);
 
-    // hold the selections from the switch toggles
+    // Hold the selections from the switch toggles (from Map Drawers)
     const [stationaryCollections, setStationaryCollections] = React.useState({});
     const [movingCollections, setMovingCollections] = React.useState({});
     const [orderCollections, setOrderCollections] = React.useState({});
@@ -155,7 +155,8 @@ export default function FullMap(props) {
         }
     };
 
-    //html2canvas functions --- saveAs, convertToImage -----
+    // html2canvas functions --- saveAs, convertToImage -----
+    // Renders and image of the map
     function saveAs(url, filename) {
         var link = document.createElement('a');
         //simulated link and link click with removal
@@ -181,7 +182,7 @@ export default function FullMap(props) {
 
     // Event handling functions ------
     const onMClick = (e) => {
-        if(props.type === 2 || props.type === 0) {
+        if(props.type === 2 || props.type === 0 || props.type === 7 ) {
             setClick(e.latLng);
             setCenter(e.latLng);
         } else if(props.type === 3 || props.type === 4 || props.type === 6) {
@@ -192,7 +193,6 @@ export default function FullMap(props) {
             clickObj.lat = e.latLng.lat();
             clickObj.lng = e.latLng.lng();
             setClicks([...clicks, clickObj]);
-            //console.log(clicks);
         } else {
             setCenter(e.latLng);
         }
@@ -214,6 +214,7 @@ export default function FullMap(props) {
 
     const onBounds = (m, p) => (event) => {
         setBounds(p.setBounds(m.getBounds()));
+        setZoom(m.getZoom())
     };
 
     const onChange = (p) => (event) => {
@@ -236,31 +237,32 @@ export default function FullMap(props) {
         setPlaceOn(!placeOn);
     }
 
+    // Info Window/Modal for Boundaries and Paths which do no have Google Maps Info Windows
     const boundsPathWindow = (title, date, time, index, ver) => (e) => {
         const popup = document.getElementById('pathBoundWindow');
         const inner = document.getElementById('popUpText');
         if(ver === 0 || ver === 2) {
             // version 0 & 2 === spatial boundaries (constructed = polyline, shelter and material boundary)
             inner.innerHTML = '';
-            inner.innerHTML = `<h5>${testNames(title)}</h5><br/>Location ${index + 1}<br/>kind: ${data.Results[title][date][time].data[index].kind}<br/>description: ${data.Results[title][date][time].data[index].description}<br/>value: ${data.Results[title][date][time].data[index].value}`
+            inner.innerHTML = `<h5>${testNames(title)}</h5><br/>Location ${index + 1}<br/>kind: ${data.Results[title][date][time].data[index].kind}<br/>description: ${data.Results[title][date][time].data[index].description}<br/>${data.Results[title][date][time].data[index].kind === 'Constructed' || data.Results[title][date][time].data[index].kind === 'Construction' ? 'Length' : 'Area'}: ${data.Results[title][date][time].data[index].value} ${data.Results[title][date][time].data[index].kind === 'Constructed' || data.Results[title][date][time].data[index].kind === 'Construction' ? 'ft' : 'ft<sup>2</sup>'}`
             popup.style.display = 'flex';
         } else if(ver === 1) {
             // version 1 == water nature collection
             const popup = document.getElementById('pathBoundWindow');
             inner.innerHTML = '';
-            inner.innerHTML = `<h5>${testNames(title)}</h5><br/>Water<br/>Location ${index[1] + 1}<br/>Description: ${data.Results[title][date][time].data[index[0]].water[index[1]].description}<br/>Area: ${data.Results[title][date][time].data[index[0]].water[index[1]].area} sq.ft.`
+            inner.innerHTML = `<h5>${testNames(title)}</h5><br/>Water<br/>Location ${index[1] + 1}<br/>Description: ${data.Results[title][date][time].data[index[0]].water[index[1]].description}<br/>Area: ${data.Results[title][date][time].data[index[0]].water[index[1]].area} ft<sup>2</sup>`
             popup.style.display = 'flex';
         } else if(ver === 3){
             // version 3 == vegetation nature collection
             const popup = document.getElementById('pathBoundWindow');
             inner.innerHTML = '';
-            inner.innerHTML = `<h5>${testNames(title)}</h5><br/>Vegetation<br/>Location ${index[1] + 1}<br/>Description: ${data.Results[title][date][time].data[index[0]].vegetation[index[1]].description}<br/>Area: ${data.Results[title][date][time].data[index[0]].vegetation[index[1]].area} sq.ft.`
+            inner.innerHTML = `<h5>${testNames(title)}</h5><br/>Vegetation<br/>Location ${index[1] + 1}<br/>Description: ${data.Results[title][date][time].data[index[0]].vegetation[index[1]].description}<br/>Area: ${data.Results[title][date][time].data[index[0]].vegetation[index[1]].area} ft<sup>2</sup>`
             popup.style.display = 'flex';
         } else {
             // version 4 moving collections
             const popup = document.getElementById('pathBoundWindow');
             inner.innerHTML = '';
-            inner.innerHTML = `<h5>${testNames(title)}</h5><br/>Location ${index + 1}<br/>mode: ${data.Results[title][date][time].data[index].mode}`
+            inner.innerHTML = `<h5>${testNames(title)}</h5><br/>Location ${index + 1}<br/>Mode: ${data.Results[title][date][time].data[index].mode}`
             popup.style.display = 'flex';
         }
     }
@@ -272,7 +274,8 @@ export default function FullMap(props) {
         inner.innerHTML = '';
     }
 
-    //Renders all selected activity options to the corresponding markers, polylines and boundaries -----
+    // Renders all selected activity options to the corresponding markers, polylines and boundaries -----
+    // Conditionals handle alternate object structures
     const actCoords = (collections) => (
         Object.entries(collections).map(([title, object], index) => (
             Object.entries(object).map(([sdate, stimes])=>(
@@ -320,44 +323,44 @@ export default function FullMap(props) {
                         ))
                         : 
                         !data.Results[title][sdate][time].data ? null : (data.Results[title][sdate][time].data).map((point, i2) => (
-                                point ? (point.mode || point.kind === 'Constructed' || point.kind === 'Construction' ? 
-                                    <Path 
+                            point ? (point.mode || point.kind === 'Constructed' || point.kind === 'Construction' ? 
+                                <Path 
+                                    key={`${sdate}.${time}.${i2}`} 
+                                    path={point.path} 
+                                    mode={point.mode ? point.mode : point.kind}
+                                    title={title} date={sdate} time={time} index={i2}
+                                    boundsPathWindow={boundsPathWindow}
+                                /> 
+                                :
+                                (point.kind === 'Shelter' || point.kind === 'Material' ? 
+                                    <Bounds 
                                         key={`${sdate}.${time}.${i2}`} 
-                                        path={point.path} 
-                                        mode={point.mode ? point.mode : point.kind}
-                                        title={title} date={sdate} time={time} index={i2}
+                                        title={title} 
+                                        date={sdate} 
+                                        time={time} 
+                                        index={i2} 
+                                        area={point.path} 
+                                        type={point.kind ? point.kind : point.result} 
                                         boundsPathWindow={boundsPathWindow}
                                     /> 
                                     :
-                                    (point.kind === 'Shelter' || point.kind === 'Material' ? 
-                                        <Bounds 
-                                            key={`${sdate}.${time}.${i2}`} 
-                                            title={title} 
-                                            date={sdate} 
-                                            time={time} 
-                                            index={i2} 
-                                            area={point.path} 
-                                            type={point.kind ? point.kind : point.result} 
-                                            boundsPathWindow={boundsPathWindow}
-                                        /> 
-                                        :
-                                        <Marker 
-                                            key={`${sdate}.${time}.${i2}`} 
-                                            shape={'circle'}
-                                            info={ point.average ? 
-                                                (`<div><b>${testNames(title)}</b><br/>Location ${i2+1}<br/>${point.average} dB</div>`) 
-                                                    : (point.result ? 
-                                                        (`<div><b>${testNames(title)}</b><br/>Location ${i2+1}<br/>${point.result}</div>`)
-                                                            : (point.posture ? 
-                                                                (`<div><b>${testNames(title)}</b><br/>Location ${i2+1}<br/>${point.posture}</div>`) 
-                                                                : null)) } 
-                                            position={point.location ? point.location : standingPoints[point.standingPoint]} 
-                                            markerType={point.average ? 'sound_maps' 
-                                                : (point.result ? point.result : (point.posture ? point.posture : null))} 
-                                            markerSize={title === 'sound_maps' ? point.average : null} 
-                                        />
-                                    )
-                                ) : null
+                                    <Marker 
+                                        key={`${sdate}.${time}.${i2}`} 
+                                        shape={'circle'}
+                                        info={ point.average ? 
+                                            (`<div><b>${testNames(title)}</b><br/>Location ${i2+1}<br/>${point.average} dB</div>`) 
+                                                : (point.result ? 
+                                                    (`<div><b>${testNames(title)}</b><br/>Location ${i2+1}<br/>${point.result}</div>`)
+                                                        : (point.posture ? 
+                                                            (`<div><b>${testNames(title)}</b><br/>Location ${i2+1}<br/>${point.posture}</div>`) 
+                                                            : null)) } 
+                                        position={point.location ? point.location : standingPoints[point.standingPoint]} 
+                                        markerType={point.average ? 'sound_maps' 
+                                            : (point.result ? point.result : (point.posture ? point.posture : null))} 
+                                        markerSize={title === 'sound_maps' ? point.average : null} 
+                                    />
+                                )
+                            ) : null
                         ))
                     )
                 ))
@@ -390,7 +393,7 @@ export default function FullMap(props) {
                         (props.type === 2 || props.type === 4 ? 
                             <Marker position={props.center} /> : 
                             (props.type === 0 || props.type === 7 ? 
-                                <Marker position={center} /> : null)) }
+                                <Marker position={click} /> : null)) }
                     { props.type === 0 ? <Places map={map} onChange={placeOn ? onChange : null} on={placeOn} togglePlaces={togglePlaces} onClick={onPClick} center={center} zoom={zoom} state={loc.state}/> : null }
                     {/* Change marker types for non center markers to show difference */}
                     { props.type === 3 || props.type === 5 ? clicks.map((latLng, i) => (<Marker key={i} position={ latLng } info={`<div>Position ${i}</div>`}/>)) : null }
@@ -400,61 +403,61 @@ export default function FullMap(props) {
             { props.type === 4 || props.type === 6 ?
                 (props.type === 4 ?
                     <div id='newAreaBlock'>
-                        <div style={{ textAlign: 'center', backgroundColor: 'white', marginBottom: '5px', padding: '5px', borderRadius: '5px', width: '30vw', border: '2px solid black' }}> Click on the map to set points for the project perimeter<div style={{fontSize: 'small'}}> *3 points minimum</div> When the perimeter is done click 'Set Bounds' </div>
+                        <div style={{ textAlign: 'center', backgroundColor: 'white', marginBottom: '5px', padding: '10px', borderRadius: '5px', width: '30vw', border: '2px solid transparent' }}> Click on the map to set points for the project perimeter<br /> When the perimeter is done click 'Set Perimeter' <div style={{ fontSize: 'small' }}> *3 points minimum</div></div>
                         <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                             {clicks.length < 3 ? null : <Button
                                 id='newAreaButton'
                                 className='newHoveringButtons confirm'
                                 component={ Link }
                                 to='points'
-                                state={({...loc.state, center: center, title: title, area: clicks, zoom: zoom })}
+                                state={{...loc.state, center: center, title: title, area: clicks, zoom: zoom }}
                             >
-                                Set Bounds
+                                Set Perimeter
                             </Button> }
                             <Button className='newHoveringButtons' onClick={removePoint}>Undo <UndoIcon /></Button>
                         </div>
                     </div>
                     :
-                    <div id='editAreaBlock'>
+                        <div id='editAreaBlock'>
+                            <Button
+                                id='newAreaButton'
+                                className='newHoveringButtons confirm'
+                                onClick={props.update(clicks)}
+                            >
+                                {loc.state.area ? 'Update Area' : 'Add Area'}
+                            </Button>
+                            <Button
+                                className='newHoveringButtons confirm'
+                                component={Link}
+                                state={loc.state}
+                                to={`../edit/${loc.pathname.split('/')[5]}/areas`}>
+                                    Cancel
+                            </Button>
+                            <Button className='newHoveringButtons' onClick={removePoint}>Undo <UndoIcon /></Button>
+                        </div>
+                )
+                : null
+            }
+            { props.type === 7 ?
+                    <div className='newPointBlock'>
                         <Button
-                            id='newAreaButton'
+                            id='newPointButton'
                             className='newHoveringButtons confirm'
-                            onClick={props.update(clicks)}
+                            onClick={props.update(center)}
                         >
-                            Update Bounds
+                            {loc.state.point ? 'Update Point' : 'Add Point'}
                         </Button>
                         <Button
                             className='newHoveringButtons confirm'
                             component={Link}
                             state={loc.state}
-                            to={`../edit/${loc.pathname.split('/')[5]}/areas`}>
-                                Cancel
-                        </Button>
-                        <Button className='newHoveringButtons' onClick={removePoint}>Undo <UndoIcon /></Button>
+                            to={`../edit/${loc.pathname.split('/')[5]}/points`}>Cancel</Button>
                     </div>
-                )
-                : null
-            }
-            { props.type === 7 ? 
-                <div className='newPointBlock'>
-                    <Button
-                        id='newPointButton'
-                        className='newHoveringButtons confirm'
-                        onClick={props.update(center)}
-                    >
-                        Update Point
-                    </Button>
-                    <Button
-                        className='newHoveringButtons confirm'
-                        component={Link}
-                        state={loc.state}
-                        to={`../edit/${loc.pathname.split('/')[5]}/points`}>Cancel</Button>
-                </div>
                 : null
             }
             { props.type === 3 ? 
-                <div id='newProjPoints' className='newPointBlock' >
-                    <div style={{ textAlign: 'center', backgroundColor: 'white', marginBottom: '5px', padding: '5px', borderRadius: '5px', width: '30vw', border: '2px solid black' }}> Click on the map to set additional standing points for recording certain activity results <div style={{ fontSize: 'small'}}> *The location specified earlier is the center and a default standing point</div></div>
+                <div className='newPointBlock' style={{top: '75px'}} >
+                    <div style={{ textAlign: 'center', backgroundColor: 'white', marginBottom: '5px', padding: '10px', borderRadius: '5px', width: '30vw', border: '2px solid transparent' }}> Click on the map to set any specific locations as standing points for recording activity results <div style={{ fontSize: 'small'}}> *The location specified earlier is the center and a default standing point</div></div>
                     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                         <Button
                             id='newPointsButton'
@@ -465,7 +468,7 @@ export default function FullMap(props) {
                                 center: center, 
                                 title: title, 
                                 area: areaData, 
-                                points: clicks, 
+                                points: clicks,
                                 zoom: zoom
                             }}
                         >
@@ -547,8 +550,7 @@ const Marker = (options) => {
     const info = options.info;
     const markerSize = Number(options.markerSize);
     const shape = options.shape;
-    const [infoWindow, setInfoWindow] = React.useState()
-    //console.log(options.position);
+    const [infoWindow, setInfoWindow] = React.useState();
 
     const colors = {
         sound_maps: ['#B073FF', '#B073FF'],
@@ -570,9 +572,9 @@ const Marker = (options) => {
     let style = {
         path: shape === 'triangle' ? 'M 0 2 L 2 2 L 1 0.25 z' : ( shape === 'lightcircle' ? 'M 10, 20 a 10, 10 0 1, 1 20, 0 a 10, 10 0 1, 1 -20, 0 M 19.5, 20 a 0.5, 0.5 0 1, 1 1, 0 a 0.5, 0.5 0 1, 1 -1, 0' : google.maps.SymbolPath.CIRCLE),
         fillColor: markerType ? colors[markerType][0] : colors.none[0],
-        fillOpacity: (markerSize ? 0.3 : 0.5),
+        fillOpacity: (markerSize ? 0.4 : (markerType === 'Behavior' || markerType === 'Maintenance' || markerType === 'animal' ? 1 : 0.5)),
         scale: (markerSize ? (markerSize/2) : (shape === 'lightcircle' ? 1 : 10)),
-        strokeWeight: 1, 
+        strokeWeight: 1,
         strokeColor: markerType ? colors[markerType][1] : colors['none'][0],
         anchor: shape === 'lightcircle' ? new google.maps.Point(19.5, 20) : (shape === 'triangle' ? new google.maps.Point(1, 1) : new google.maps.Point(0,0))
     };
@@ -599,6 +601,7 @@ const Marker = (options) => {
         };
     }, [marker, icon, info, infoWindow, markerType]);
 
+    // handles any coordinates from DB with latitude and longitude
     React.useEffect(() => {
         if (marker) {
             marker.setOptions({ clickable: true, map: options.map, position: options.position && options.position.latitude ? (new google.maps.LatLng(options.position.latitude, options.position.longitude)) : (options.position ? options.position : null) });
@@ -620,8 +623,8 @@ const Bounds = ({boundsPathWindow, ...options}) => {
     const [paths, setPaths] = React.useState();
     const type = options.type;
     var tempArea = [];
-    //console.log(options.area);
 
+    // Handles any DB coordinates with latitude and longitude, which Google Maps does not accept
     if(!options.ver){
         (options.area).map((point) => (
             tempArea.push(new google.maps.LatLng(point.latitude, point.longitude))
@@ -636,18 +639,18 @@ const Bounds = ({boundsPathWindow, ...options}) => {
     const bounds = {
         area: {
             paths: area,
-            strokeColor: 'rgba(255,0,0,0.5)',
+            strokeColor: 'rgba(255,0,0,0.7)',
             strokeOpacity: 0.8,
             strokeWeight: 3,
-            fillColor: 'rgba(0,0,0,0.3)',     
-            clickable: false                 
+            fillColor: 'rgba(0,0,0,0.4)',
+            clickable: false
         },
         types: {
             paths: area,
-            strokeColor: type === 'water' ? '#2578C5' : (type === 'vegetation' ? '#ff0000' : (type === 'Material' ? '#00FFC1' : (type === 'Shelter' ? '#FFA64D' : (type === 'New' ? 'rgba(255,0,0,0.5)' : '#FFFFFF')))),
+            strokeColor: type === 'water' ? '#96dcff' : (type === 'vegetation' ? '#ff0000' : (type === 'Material' ? '#00FFC1' : (type === 'Shelter' ? '#FFA64D' : (type === 'New' ? 'rgba(255,0,0,0.5)' : '#FFFFFF')))),
             strokeWeight: 2,
-            fillColor: type === 'water' ? '#2578C5' : (type === 'vegetation' ? '#BEFF05' : (type === 'Material' ? '#00FFC1' : (type === 'Shelter' ? '#FFA64D' : (type === 'New' ? 'rgba(255,0,0,0.5)' :'#C4C4C4')))),
-            fillOpacity: 0.45,
+            fillColor: type === 'water' ? '#96dcff' : (type === 'vegetation' ? '#BEFF05' : (type === 'Material' ? '#00FFC1' : (type === 'Shelter' ? '#FFA64D' : (type === 'New' ? 'rgba(255,0,0,0.5)' :'#C4C4C4')))),
+            fillOpacity: 0.50,
             clickable: type === 'New' ? false : true
         },
     }
@@ -684,10 +687,12 @@ const Bounds = ({boundsPathWindow, ...options}) => {
 const Path = ({boundsPathWindow, ...options}) => {
     const type = options.title;
     var tempPath = [];
+
+    // Handling any arrays from DB that have latitude, longitude
     (options.path).map((point) => (
         tempPath.push(new google.maps.LatLng(point.latitude, point.longitude))
     ))
-    //console.log(tempPath);
+    
     const [path, setPath] = React.useState();
     const colors = {
         Walking: '#0000FF',
@@ -720,6 +725,7 @@ const Path = ({boundsPathWindow, ...options}) => {
         };
     }, [path, lines.style]);
 
+    // Updates changes in path (drawing a new project area)
     React.useEffect(() => {
         if (path) {
             path.setOptions({ map: options.map });
@@ -737,6 +743,7 @@ const Path = ({boundsPathWindow, ...options}) => {
     return null;
 }
 
+// Function for drawing a new project Area
 const NewArea = (points) => (
     !points ? null : 
         (points.length <= 1 ?
@@ -762,6 +769,7 @@ const NewArea = (points) => (
         )
 );
 
+// Toggleable Places Widget for a New Project
 interface PlaceProps extends google.maps.places.AutocompleteOptions {
     onChange?: (place: google.maps.places.Autocomplete) => void;
 }
@@ -818,11 +826,11 @@ const Places: React.FC<PlaceProps> = ({onChange, ...options}) => {
                 className='newHoveringButtons' 
                 id='newLocationButton' 
                 component={ Link } to='area' 
-                state={({ ...options.state,
+                state={{ ...options.state,
                     center: options.center, 
                     title: ( options.on && placesWidget && placesWidget.getPlace() ? placesWidget.getPlace().name : ref?.current?.value),
                     zoom: options.zoom
-                })}
+                }}
             >
                 Set Project Location
             </Button>

@@ -26,7 +26,6 @@ export default function EditAreas(){
         const popup = document.getElementById('deleteWindow');
         const inner = document.getElementById('popUpText');
         currId = id;
-        // version 0 & 2 === spatial boundaries (constructed = polyline, shelter and material boundary)
         inner.innerHTML = '';
         inner.innerHTML = `<h6>Are you sure you would like to delete '${title}'?<br/> This cannot be undone.</h6>`
         popup.style.display = 'flex';
@@ -34,7 +33,7 @@ export default function EditAreas(){
 
     const closeWindow = (e) => {
         e.preventDefault();
-        console.log('close');
+        //console.log('close');
         const popup = document.getElementById('deleteWindow');
         const inner = document.getElementById('popUpText');
         popup.style.display = 'none';
@@ -86,5 +85,4 @@ export default function EditAreas(){
             </div>
         </div>
     );
-
 }

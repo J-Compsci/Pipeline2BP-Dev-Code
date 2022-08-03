@@ -7,20 +7,29 @@ import ActivityPage from './ActivityPage';
 import SurveyorPage from './SurveyorPage';
 import NewActivityTimes from './NewActivityTimes';
 
-function ProjectPage(){
-    //loc state recieved from (project type) Display Cards on TeamHome(listing team projects)
+/* 
+    (1) Handles routes to projects/:id/(activities/map/surveyors) 
+    (2) Sets object structure for Results, Graphs, and Data drawers(menus) on the Map Page
+
+*/
+
+export default function ProjectPage(){
+    // Retrieve Location info
     const loc = useLocation();
+    // Boolean to load routes after data has been reformatted
     const [loaded, setLoaded] = React.useState(false);
-    //Holds basic projects info including map ids, default data overwritten on async function
+    // Holds basic projects info including map ids
     const [projectInfo, setProjectInfo] = React.useState();
     const [standingPoints, setStandingPoints] = React.useState();
     const [drawer, setDrawer] = React.useState();
     const [activities, setActivities] = React.useState();
+    // Retrive User info/token from location state
     const user = loc.state ? loc.state.userToken : {};
     // page url: path (split index)
     // can be reached at (heroku-url)/home (1)/teams (2)/ :id (3) /projects (4)/:id (5)
     const projectId = loc.pathname.split('/')[5];
-    //Holds specifics like results, locations, and types of markers, boundaries, etc.
+    // Holds specifics like results, locations, and types of markers, boundaries, etc.
+    // Data is reformatted for performance
     var results = {};
     var sPoints = {};
 
@@ -37,11 +46,11 @@ function ProjectPage(){
 
             setProjectInfo(response.data);
 
+            //get Map data for activity results (needed for mui drawers)
             response?.data?.standingPoints.map((point) => (
                 sPoints[point._id] = { latitude: point.latitude, longitude: point.longitude }
             ));
 
-            //get Map data for activity results (needed in drawers)
             response?.data?.boundariesCollections.map((collection) => (
                 collection.maps.map(async (id, index) => {
                     await collectionPoints(id, 'bounds', collection.date, index);
@@ -81,6 +90,7 @@ function ProjectPage(){
             setActivities(results);
             setStandingPoints(sPoints);
             setDrawer({ Results: results, Graphs: '', Data: '' });
+            // After all other values are set loaded to true to render routes with appropriate data
             setLoaded(true);
             
         } catch(error){
@@ -112,23 +122,44 @@ function ProjectPage(){
                 withCredentials: true
             });
 
-            console.log(response.data);
-            
-            var date = new Date(dateTime);
             var map = results;
-            //console.log(typeof (dateTime));
-            if (!map[apiCategory[cat]]) {
-                map[apiCategory[cat]] = {};
+
+            if (response?.data && response?.data.date && response?.data.date !== null){
+                var date = new Date(dateTime);
+                var format = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+                
+                var time = new Date(response?.data.date);
+                var set = time.toLocaleTimeString();
+
+                if (!map[apiCategory[cat]]) {
+                    map[apiCategory[cat]] = {};
+                }
+                if (!map[apiCategory[cat]][format]) {
+                    map[apiCategory[cat]][format] = {};
+                }
+                if (map[apiCategory[cat]][format][set]){
+                    map[apiCategory[cat]][format][`${set} (${index})`] = await response.data;
+                }else{
+                    map[apiCategory[cat]][format][set] = await response.data;
+                }
             }
-            if(!map[apiCategory[cat]][date.toLocaleDateString()]){ 
-                map[apiCategory[cat]][`${date.toLocaleDateString()}`] = {};
-            }
-            var time = new Date(response?.data.date).toLocaleTimeString();
-            if (map[apiCategory[cat]][date.toLocaleDateString()][time]){
-                map[apiCategory[cat]][date.toLocaleDateString()][`${time} (${index})`] = await response.data;
-            }else{
-                map[apiCategory[cat]][date.toLocaleDateString()][time] = await response.data;
-            }
+
+            /* !!Structure reformatted for info and access ex: 
+                **the map page drawers access the date and time from this for easy access
+                **if changed to be organized by name keys instead of date and time keys
+                **change references to access date and time from the response data portion
+
+                results = {
+                    light_maps: {
+                        '02/22/22':{
+                            '9:30:-- AM':{
+                                (light_maps response data)
+                            }
+                        }
+
+                    }
+                }
+            */
 
             results = map;
         } catch (error) {
@@ -142,15 +173,11 @@ function ProjectPage(){
         projectData()
     }, []);
 
-    //loading in center from project
+    //loading in center, areas, and subareas from information
     var center = { lat: projectInfo?.standingPoints[0].latitude, lng: projectInfo?.standingPoints[0].longitude };
     var area = projectInfo?.area?.points;
     var subAreas = projectInfo?.subareas;
     
-    //console.log(drawer);
-    console.log(projectInfo);
-    //console.log(standingPoints);
-    console.log(drawer);
     return (
         <div id='ProjectPage'>
             <TabPanel state={ loc.state }/>
@@ -199,5 +226,3 @@ function ProjectPage(){
         </div>
     );
 }
-
-export default ProjectPage;

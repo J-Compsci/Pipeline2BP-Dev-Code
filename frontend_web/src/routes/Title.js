@@ -12,13 +12,12 @@ import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-
 import { Link, useNavigate } from 'react-router-dom';
-
 import './routes.css';
 import logo1 from '../images/PtBPLogo.png';
 
-function Title(props) {
+export default function Title(props) {
+    // Props from App.js, login function to pass user/token info to AppNavBar
     let nav = useNavigate();
     // Access email, password like values.email, do not mutate or modify
     const [values, setValues] = React.useState({
@@ -82,7 +81,6 @@ function Title(props) {
                headers: { 'Content-Type': 'application/json' },
                withCredentials: true
             });
-            //console.log(JSON.stringify(response));
             let user = response.data;
             // user login confirmation and navigation handling in App.js
             // retrieve user's name or name and token to verify status
@@ -113,6 +111,12 @@ function Title(props) {
                 </div>
                 <div className='tagBox'>
                     <Card className='formCard'>
+                        <div className='tag tag1' >
+                            <div className='logo logo1'>
+                                <Image src={logo1} className='App-logo' alt='logo' id='logo2' />
+                            </div>
+                            <div id='tagText'>Pipeline to Better Placemaking</div>
+                        </div>
                         <Card.Body>
                             <Box id='titleBox' component='form' sx={{ display: 'flex', flexWrap: 'wrap' }}>
                                 <span ref={loginResponse} style={{ display: 'none', color: 'red' }}>{message}</span>
@@ -176,5 +180,3 @@ function Title(props) {
         </div>
     );
 }
-
-export default Title;

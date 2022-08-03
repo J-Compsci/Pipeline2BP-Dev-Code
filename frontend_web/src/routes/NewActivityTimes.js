@@ -4,17 +4,16 @@ import Button from '@mui/material/Button';
 import Card from 'react-bootstrap/Card';
 import DoneIcon from '@mui/icons-material/Done';
 import axios from '../api/axios';
-
 import TimeForm from '../components/TimeForm';
 import { testNames } from '../functions/HelperFunctions';
 import '../components/controls.css';
 
-function NewActivityTimes(props) {
+export default function NewActivityTimes(props) {
     const nav = useNavigate();
     const loc = useLocation();
     const [message, setMessage] = React.useState('');
     const response = React.useRef(null);
-
+    const [timeSlots, setTimeSlots] = React.useState([]);
     const date = new Date();
     const [activity, setActivity] = React.useState({
         title: loc.state.form.title && loc.state.form.title !== '' ? loc.state.form.title : testNames(loc.state.form.activity),
@@ -23,8 +22,6 @@ function NewActivityTimes(props) {
         timer: loc.state.form.timer,
         number: 0
     });
-
-    const [timeSlots, setTimeSlots] = React.useState([]);
 
     const collections = {
         boundaries_maps: ['boundaries_collections', 'boundary'],
@@ -111,13 +108,13 @@ function NewActivityTimes(props) {
     }
 
     const addNewActivity = async (e) => {
-        //console.log(props.projectInfo._id);
-        //console.log(collections[activity.activity][0]);
+        var isoDate = new Date(`${activity.date}T00:00:00`)
+        console.log(isoDate.toISOString());
 
         try {
             const response = await axios.post(`/projects/${props.projectInfo._id}/${collections[activity.activity][0]}`, JSON.stringify({ 
                 title: activity.title,
-                date: activity.date,
+                date: isoDate.toISOString(),
                 area: props.projectInfo.subareas[0]._id,
                 duration: `${activity.timer}`
 
@@ -130,22 +127,17 @@ function NewActivityTimes(props) {
                 withCredentials: true
             });
 
+            // create collection then add time slots to the collection
             let collectionDetails = await response.data;
-            //console.log(collectionDetails);
-
             for(let i = 0; i < timeSlots.length; i++){
                 await addNewTimeSlots(timeSlots[i], activity.title, collectionDetails._id, `${activity.activity}/`, timeSlots[i].type)
             }
 
-            //console.log('After add new time slots');
             collectionDetails.test_type = collections[activity.activity][1];
-            //console.log(collectionDetails.test_type);
             collectionDetails.date = new Date(collectionDetails.date);
-            //console.log(collectionDetails.date);
-
             let area = props.projectInfo.subareas.findIndex((element) => element._id === collectionDetails.area);
             collectionDetails.area = props.projectInfo.subareas[area];
-            //console.log('After add new time slots');
+
             nav('../', { replace: true, state: {team: loc.state.team, project: loc.state.project, userToken: loc.state.userToken} });
             
         } catch (error) {
@@ -158,6 +150,7 @@ function NewActivityTimes(props) {
 
     const addNewTimeSlots = async (timeSlot, title, id, timeSlotName, type) => {
         var selectedPoints = [];
+
         if (type !== 'boundary' && type !== 'nature' && type !== 'order' && type !== 'survey'){
             if(timeSlot.points && timeSlot.points.length !== 0){
                 Object.entries(timeSlot.points).forEach(([pointInd, bool])=>(
@@ -168,9 +161,9 @@ function NewActivityTimes(props) {
             selectedPoints = props.projectInfo.standingPoints;
         }
 
-        //console.log(selectedPoints);
-        //console.log(timeSlot);
-        //console.log((new Date(`${activity.date} ${timeSlot.time}`)).toISOString())
+        var adjusted = new Date(`${activity.date}T${timeSlot.time}`);
+        console.log(adjusted);
+        console.log(adjusted.toISOString())
 
         try {
             const response = await axios.post(`/${timeSlotName}`, JSON.stringify({
@@ -179,7 +172,7 @@ function NewActivityTimes(props) {
                 researchers: [],
                 project: props.projectInfo._id, 
                 collection: id,
-                date: (new Date(`${activity.date} ${timeSlot.time}`)).toISOString(),
+                date: (adjusted.toISOString()),
                 maxResearchers: `${timeSlot.maxResearchers}`
             }), {
                 headers: {
@@ -227,5 +220,3 @@ function NewActivityTimes(props) {
         </div>
     );
 }
-
-export default NewActivityTimes;

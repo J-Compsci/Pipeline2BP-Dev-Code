@@ -1,12 +1,9 @@
 import * as React from 'react';
 import Form from 'react-bootstrap/Form';
-import { useLocation } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 
 function TimeForm(props) {
-    const date = new Date();
-    const activitySelection = useLocation();
     const index = props.index;
     const standingPoints = props.standingPoints;
     const [timeForm, setTimeForm] = React.useState(props.points ? {
@@ -66,7 +63,7 @@ function TimeForm(props) {
                 props.points ?
                 <div className='form-group'>
                     <Form.Label>Points:</Form.Label>
-                    <div className="mb-3">
+                    <div className='mb-3'>
                         { standingPoints.map((point, index) => (
                             <Form.Check
                                 inline

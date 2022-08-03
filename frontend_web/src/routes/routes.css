@@ -1,3 +1,48 @@
+@media (max-width: 599px) {
+
+    div.tag{
+        display: none;
+    }
+
+    div.tag1{
+        display: block;
+    }
+
+    div.pageTemplate {
+        padding: 10px 1vw;
+    }
+
+    .tagBox {
+        width: 80vw;
+        height: 60vh;
+    }
+
+    .formCard {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+        width: 100%;
+        padding-top: 10px;
+    }
+
+    .card-body{
+        width: 100%;
+    }
+}
+
+@media (min-width: 600px){
+    div.tag {
+        display: block;
+    }
+        
+    div.tag1 {
+        display: none;
+    }
+
+}
+
 .App-header {
     background-color: #282c34;
     min-height: 100vh;
@@ -53,6 +98,8 @@ a.backButton>svg.css-i4bv87-MuiSvgIcon-root, a.backButton>svg.MuiSvgIcon-root {
     border-bottom: 1px solid #bcbcbc;
 }
 
+
+
 .iconShadow:hover {
     -webkit-filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, .7));
     filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.328));
@@ -62,16 +109,20 @@ a.backButton>svg.css-i4bv87-MuiSvgIcon-root, a.backButton>svg.MuiSvgIcon-root {
     margin-bottom: 5vh;
     z-index: 0;
 }
-.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root#logoutSingle, .MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root#verifyButton, a.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root.cancelButton, button#deleteButton {
+
+.logo1{
+    margin-bottom: 1px;
+}
+.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root#logoutSingle, .MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root#verifyButton, a.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root.cancelButton, button#deleteButton, a#deleteButton,.cancelButton {
     color: rgb(255, 255, 255);
     margin-top: 10px;
     width: auto;
 }
 
-.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root#logoutSingle, a.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root.cancelButton, button#deleteButton {
+.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root#logoutSingle, a.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root.cancelButton, button#deleteButton, a#deleteButton, .cancelButton {
     background-color: #ff4258;
 }
-.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root#logoutSingle:hover, a.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root.cancelButton:hover, button#deleteButton:hover {
+.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root#logoutSingle:hover, a.MuiButton-root.MuiButton-text.MuiButton-textPrimary.MuiButton-sizeLg.MuiButton-textSizeLg.MuiButtonBase-root.cancelButton:hover, button#deleteButton:hover, a#deleteButton, .cancelButton:hover {
     box-shadow: 0 4px 8px 0 rgba(255, 66, 88, 0.2), 0 6px 20px 0 rgba(255, 66, 88, 0.19);
 }
 
@@ -117,6 +168,25 @@ a.backButton>svg.css-i4bv87-MuiSvgIcon-root, a.backButton>svg.MuiSvgIcon-root {
     padding: 5vh 5vw;
     z-index: -2;
 }
+div#faqPage div.pageTemplate{
+    text-align: left;
+    flex-direction: column;
+    color: white;
+}
+
+div#tOC{
+    background-color: #FFFFFF;
+    padding: 10px;
+    border-radius: 10px;
+    color: black;
+    width: 60vw;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+div.pageTemplate > h2{
+    margin-top: 10px;
+}
 
 .secondButton {
     align-content: stretch;
@@ -130,13 +200,23 @@ a.backButton>svg.css-i4bv87-MuiSvgIcon-root, a.backButton>svg.MuiSvgIcon-root {
     z-index: 2;
 }
 
+.tag1{
+    color: black;
+}
+
 .tagBox {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
     min-width: 30vw;
-    max-width: 50vw;
+    max-width: 80vw;
+    min-height: 30vh;
+    max-height: 80vh;
     z-index: 3;
 }
 
-#titlePage, #forgotPass, #resetPass {
+#titlePage, #forgotPass, #resetPass, #faqPage {
     padding: 20px;
 }
 
@@ -184,6 +264,8 @@ div#createCard > div.card-body{
 div#editAreaMap > div#mapDoc, div#editAreaMap div#mapFrame, div#editPointMap>div#mapDoc,
 div#editPointMap div#mapFrame{
     height: calc(100vh - 69px);
+    width: calc(100vw - 1px);
+    overflow-x: hidden;
 }
 
 div#MapPage {
@@ -204,7 +286,8 @@ div#timeCardContent, div#areaCardContent, div#pointCardContent {
 
 div#userHome, div#teamHome div#cardFlexBox{
     overflow-y: scroll;
-    width: 100vw;
+    overflow-x: hidden;
+    width: 99vw;
 }
 
 div.MuiCardContent-root {
@@ -258,16 +341,14 @@ form.MuiBox-root {
 }
 
 #logo2 {
-    position: absolute;
-    top: 25vh;
-    left: 30vw;
+    position: relative;
     z-index: -1;
 }
 
 #MapPage {
     height: calc(100vh - 113px);
     background-color: rgb(56, 56, 56);
-    width: 100vw;
+    width: calc(100vw - 1px);
 }
 
 #newProjectButton, a#newTeamButton {
@@ -304,8 +385,13 @@ form.MuiBox-root {
     margin-top: 10px;
 }
 
-#settingsCard{
+#settingsCard, #inviteCard{
     width: 50vw;
+}
+
+#inviteCard{
+    flex-wrap: nowrap;
+    overflow-x: scroll;
 }
 
 #tagText {
@@ -340,6 +426,9 @@ div#projectEdit h1, div#projectCreate h1, div#teamEdit h1{
 
 div#settingsTemplate{
     background-color: #acacac;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 60vw;
 }
 
 form#titleBox {
@@ -347,7 +436,7 @@ form#titleBox {
     margin-bottom: 10px;
     padding-bottom: 5px;
 }
-div#userSettings {
+div#accountPage {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -357,7 +446,7 @@ div#userSettings {
     margin: 10px;
 }
 
-div#userSettings h1 {
+div#accountPage h1 {
     margin: 20px 0px;
 }
 

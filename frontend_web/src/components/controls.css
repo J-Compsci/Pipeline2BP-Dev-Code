@@ -141,7 +141,7 @@ div#deleteWindow button#deleteButton, div#deleteWindow button#cancelButton{
     left: calc(100vw - 450px)
 }
 
-#newProjectInput, #newAreaBlock, div.newPointBlock, #editAreaBlock{
+#newProjectInput, #newAreaBlock, div.newPointBlock, div#editAreaBlock{
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -165,7 +165,7 @@ div.newPointBlock{
     left: calc(50vw - 150px);
 }
 
-#editAreaBlock{
+#editAreaBlock, div.newPointBlock{
     top: 130px;
 }
 
@@ -247,6 +247,10 @@ a.newHoveringButtons:hover, button.newHoveringButtons:hover {
     background-color: #daebff;
 }
 
+a#addButton.newHoveringButtons{
+    z-index: 10;
+}
+
 button#placesButton{
     margin-right: 5px;
     margin-bottom: 0px;
@@ -266,10 +270,11 @@ div.Charts{
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    align-content: center;
 }
 
 div#MapPage div#mapFrame{
-    width:100vw;
+    width:calc(100vw - 1px);
     top: -73px;
 }
 
@@ -303,7 +308,7 @@ div#projectCreate div#mapFrame {
 }
 
 div#newProject div#mapFrame, div#newPoints div#mapFrame, div#newArea div#mapFrame {
-    width: 100vw;
+    width: calc(100vw - 1px);
     height: calc(100vh - 69px);
 }
 
@@ -445,7 +450,7 @@ th.value, th.type, td.value, td.type {
 }
 
 tr.categories {
-    background-color: #aed5fa;
+    background-color: #69b2f7;
 }
 
 iframe#printFrame {

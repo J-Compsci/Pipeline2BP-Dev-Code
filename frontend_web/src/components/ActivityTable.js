@@ -1,6 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
@@ -8,11 +9,12 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { testNames } from '../functions/HelperFunctions';
 
-// Collapsible Table for Activity Page
+// Collapsible Table for Activity Page, Activity Titles
 function Row(props) {
     const row = props.row;
     const name = props.name;
@@ -41,7 +43,7 @@ function Row(props) {
             <TableRow className='subtables'>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={ 12 }>
                     <Collapse in={ open } timeout='auto' unmountOnExit>
-                        { subtable(row, 0, name) }
+                        { subtable(row, 0, name, props.open) }
                     </Collapse>
                 </TableCell>
             </TableRow>
@@ -51,7 +53,8 @@ function Row(props) {
 
 //Subtables for Map Page Data Drawer and Activity Page Collapsible Table
 //type 0 is the subtable for The activity page, 1 is the Map page table
-const subtable = (row, type, name) => (    
+// handles alternate structures for different activities
+const subtable = (row, type, name, open) => (    
     <Box sx={{ margin: 1 }} className='subTable'>
         <Table stickyHeader size='small' aria-label='activity'>
             <TableHead sx={{ bgcolor: '#e2e2e2'}}>
@@ -74,28 +77,41 @@ const subtable = (row, type, name) => (
                                     Object.entries(object).map(([natureType, pointArr], i1) => (
                                         natureType === '_id' || natureType === 'time' ? null :
                                             (natureType === 'weather' ? 
-                                                <TableRow key={`${index}.${i1}`}>
-                                                    <TableCell colSpan={2} className='value'>
-                                                        {pointArr.temperature}&ordm;F
-                                                    </TableCell>
-                                                    <TableCell colSpan={2} className='type'>
-                                                        {`Weather ${pointArr.description}`}
-                                                    </TableCell>
-                                                    <TableCell>N/A</TableCell>
-                                                    <TableCell>{date} {time}</TableCell>
-                                                    <TableCell>{tObj.researchers.map((researcher) => (`${researcher.firstname} ${researcher.lastname}`))}</TableCell>
-                                                </TableRow>
+                                                <>
+                                                    <TableRow style={{ backgroundColor: '#aed5fa' }}>
+                                                        <TableCell align='center' colSpan={4} className='value'>
+                                                            {tObj.title}
+                                                        </TableCell>
+                                                        <TableCell align='right' colSpan={2}>
+                                                            {date} {time}
+                                                        </TableCell>
+                                                        <TableCell align='right' colSpan={1}>
+                                                            <Button onClick={open(name, tObj.title, tObj._id)}><DeleteIcon /></Button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                    <TableRow key={`${index}.${i1}`}>
+                                                        <TableCell colSpan={2} className='value'>
+                                                            {pointArr.temperature}&ordm;F
+                                                        </TableCell>
+                                                        <TableCell colSpan={2} className='type'>
+                                                            {`Weather ${pointArr.description}`}
+                                                        </TableCell>
+                                                        <TableCell>N/A</TableCell>
+                                                        <TableCell>{date} {time}</TableCell>
+                                                        <TableCell>{tObj.researchers.map((researcher, index) => (index !== (tObj.researchers.length - 1) ? `${researcher.firstname} ${researcher.lastname}, ` : `${researcher.firstname} ${researcher.lastname}`))}</TableCell>
+                                                    </TableRow>
+                                                </>
                                             : pointArr.map((natureObj, i3)=>(                                        
                                                 <TableRow key={`${index}.${i1}`}>
                                                     <TableCell colSpan={2} className='value'>
-                                                        {natureType === 'animal' ? `${natureObj.kind}` : `${natureObj.area} sq.ft.`}
+                                                        {natureType === 'animal' ? `${natureObj.kind}` : `${natureObj.area} ft\u00B2`}
                                                     </TableCell>
                                                     <TableCell colSpan={2} className='type'>
-                                                        {`${natureObj.description}`}
+                                                        {natureType === 'animal' ? `Animal: ${natureObj.description}` : (natureType === 'water' ? `Water: ${natureObj.description}` : `Vegetation: ${natureObj.description}`)}
                                                     </TableCell>
                                                     <TableCell>Location {i3 + 1}</TableCell>
                                                     <TableCell>{date} {time}</TableCell>
-                                                    <TableCell>{tObj.researchers.map((researcher) => (`${researcher.firstname} ${researcher.lastname}`))}</TableCell>
+                                                    <TableCell>{tObj.researchers.map((researcher, index) => (index !== (tObj.researchers.length - 1) ? `${researcher.firstname} ${researcher.lastname}, ` : `${researcher.firstname} ${researcher.lastname}`))}</TableCell>
                                                 </TableRow>
                                             )))
                                     ))
@@ -107,17 +123,43 @@ const subtable = (row, type, name) => (
                             Object.entries(dObj).map(([time, tObj]) => (
                                 tObj.data.map((object, index) => (
                                     Object.values(object.points).map((point, i1)=>(
-                                    <TableRow key={`${index}.${i1}`}>
-                                        <TableCell colSpan={2} className='value'>
-                                            { point.kind ? point.kind : 'N/A'}
-                                        </TableCell>
-                                        <TableCell colSpan={2} className='type'>
-                                            { point.description ? `${point.description}` : `${point.light_description}` }
-                                        </TableCell>
-                                        <TableCell>Location {i1 + 1}</TableCell>
-                                        <TableCell>{date} {time}</TableCell>
-                                            <TableCell>{tObj.researchers.map((researcher) => (`${researcher.firstname} ${researcher.lastname}`))}</TableCell>
-                                    </TableRow>
+                                        i1 === 0 ? 
+                                            <>
+                                                <TableRow style={{ backgroundColor: '#aed5fa' }}>
+                                                    <TableCell align='center' colSpan={4} className='value'>
+                                                        {tObj.title}
+                                                    </TableCell>
+                                                    <TableCell align='right' colSpan={2}>
+                                                        {date} {time}
+                                                    </TableCell>
+                                                    <TableCell align='right' colSpan={1}>
+                                                        <Button onClick={open(name, tObj.title, tObj._id)}><DeleteIcon /></Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                                <TableRow key={`${index}.${i1}`}>
+                                                    <TableCell colSpan={2} className='value'>
+                                                        {point.kind ? point.kind : 'N/A'}
+                                                    </TableCell>
+                                                    <TableCell colSpan={2} className='type'>
+                                                        {point.description ? `${point.description}` : `${point.light_description}`}
+                                                    </TableCell>
+                                                    <TableCell>Location {i1 + 1}</TableCell>
+                                                    <TableCell>{date} {time}</TableCell>
+                                                    <TableCell>{tObj.researchers.map((researcher, index) => (index !== (tObj.researchers.length - 1) ? `${researcher.firstname} ${researcher.lastname}, ` : `${researcher.firstname} ${researcher.lastname}`))}</TableCell>
+                                                </TableRow>
+                                            </> 
+                                        : 
+                                        <TableRow key={`${index}.${i1}`}>
+                                            <TableCell colSpan={2} className='value'>
+                                                { point.kind ? point.kind : 'N/A'}
+                                            </TableCell>
+                                            <TableCell colSpan={2} className='type'>
+                                                { point.description ? `${point.description}` : `${point.light_description}` }
+                                            </TableCell>
+                                            <TableCell>Location {i1 + 1}</TableCell>
+                                            <TableCell>{date} {time}</TableCell>
+                                                <TableCell>{tObj.researchers.map((researcher, index) => (index !== (tObj.researchers.length - 1) ? `${researcher.firstname} ${researcher.lastname}, ` : `${researcher.firstname} ${researcher.lastname}`))}</TableCell>
+                                        </TableRow>
                                    ))
                                 ))
                             ))
@@ -125,17 +167,43 @@ const subtable = (row, type, name) => (
                     : (Object.entries(row).map(([date, dObj])=>(
                         Object.entries(dObj).map(([time, tObj])=>(
                             tObj.data.map((object, index) => (
-                                <TableRow key={ index }>
-                                    <TableCell colSpan={ 2 } className='value'>
-                                        {object.average ? `${object.average} dB` : (object.value && (object.kind === 'Construction' || object.kind === 'Constructed')? `${object.value} ft.` : (object.value && object.kind ? `${object.value} sq.ft.` : (object.posture ? object.posture : (object.mode ? object.mode : ''))))}
-                                    </TableCell>
-                                    <TableCell colSpan={ 2 } className='type'>
-                                        {object.average ? `${object.sound_type}` : (object.kind ? (`${object.kind} (${object.description})`) : (object.age ? `${object.age} ${object.gender} (${object.activity})` : 'N/A'))}
-                                    </TableCell>
-                                    <TableCell>Location { index + 1 }</TableCell>
-                                    <TableCell>{ date } { time }</TableCell>
-                                    <TableCell>{tObj.researchers.map((researcher) => (`${researcher.firstname} ${researcher.lastname}`))}</TableCell>
-                                </TableRow>
+                                index === 0 ? 
+                                    <>
+                                        <TableRow style={{ backgroundColor: '#aed5fa' }}>
+                                            <TableCell align='center' colSpan={4} className='value'>
+                                                {tObj.title}
+                                            </TableCell>
+                                            <TableCell align='right' colSpan={2}>
+                                                {date} {time}
+                                            </TableCell>
+                                            <TableCell align='right' colSpan={1}>
+                                                <Button onClick={open(name, tObj.title, tObj._id)}><DeleteIcon /></Button>
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow key={ index }>
+                                            <TableCell colSpan={ 2 } className='value'>
+                                                {object.average ? `${object.average} dB` : (object.value && (object.kind === 'Construction' || object.kind === 'Constructed') ? `${object.value} ft` : (object.value && object.kind ? `${object.value} ft\u00B2` : (object.posture ? object.posture : (object.mode ? object.mode : ''))))}
+                                            </TableCell>
+                                            <TableCell colSpan={ 2 } className='type'>
+                                                {object.average ? `${object.sound_type}` : (object.kind ? (`${object.kind} (${object.description})`) : (object.age ? `${object.age} ${object.gender} (${object.activity})` : 'N/A'))}
+                                            </TableCell>
+                                            <TableCell>Location { index + 1 }</TableCell>
+                                            <TableCell>{ date } { time }</TableCell>
+                                            <TableCell>{tObj.researchers.map((researcher, index) => (index !== (tObj.researchers.length - 1) ? `${researcher.firstname} ${researcher.lastname}, ` : `${researcher.firstname} ${researcher.lastname}`))}</TableCell>
+                                        </TableRow>
+                                    </>
+                                :
+                                    <TableRow key={ index }>
+                                        <TableCell colSpan={ 2 } className='value'>
+                                            {object.average ? `${object.average} dB` : (object.value && (object.kind === 'Construction' || object.kind === 'Constructed') ? `${object.value} ft` : (object.value && object.kind ? `${object.value} ft\u00B2` : (object.posture ? object.posture : (object.mode ? object.mode : ''))))}
+                                        </TableCell>
+                                        <TableCell colSpan={ 2 } className='type'>
+                                            {object.average ? `${object.sound_type}` : (object.kind ? (`${object.kind} (${object.description})`) : (object.age ? `${object.age} ${object.gender} (${object.activity})` : 'N/A'))}
+                                        </TableCell>
+                                        <TableCell>Location { index + 1 }</TableCell>
+                                        <TableCell>{ date } { time }</TableCell>
+                                        <TableCell>{tObj.researchers.map((researcher, index) => (index !== (tObj.researchers.length - 1) ? `${researcher.firstname} ${researcher.lastname}, ` : `${researcher.firstname} ${researcher.lastname}`))}</TableCell>
+                                    </TableRow>
                             ))
                         ))
                     ))))
@@ -167,18 +235,19 @@ const subtable = (row, type, name) => (
                                                     </TableCell>
                                                     <TableCell colSpan={1} className='value'>
                                                         {
-                                                            nature.area ? `${nature.area} sq.ft.` : nature.kind
+                                                            nature.area ? `${nature.area} ft\u00B2` : nature.kind
                                                         }
                                                     </TableCell>
                                                     <TableCell>
                                                         {
-                                                            `${nature.description}`
+                                                            type === 'animal' ? `Animal: ${nature.description}` : (type === 'water' ? `Water: ${nature.description}` : `Vegetation: ${nature.description}`)
                                                         }
                                                     </TableCell>
                                                     <TableCell>Location {in1 + 1}</TableCell>
                                                     <TableCell>{`${instance.split('.')[1]} ${instance.split('.')[2]}`}</TableCell>
                                                 </TableRow>
-                                            )))
+                                            ))
+                                        )
                                 ))
                             :
                                 instance.split('.')[0] === 'light_maps' || instance.split('.')[0] === 'order_maps' ? 
@@ -206,7 +275,7 @@ const subtable = (row, type, name) => (
                                         </TableCell>
                                         <TableCell colSpan={1} className='value'>
                                             {
-                                                instance.split('.')[0] === 'sound_maps' ? `${inst.average} dB` : (inst.value && (inst.kind === 'Construction' || inst.kind === 'Constructed') ? `${inst.value} ft.` : (inst.value && inst.kind ? `${inst.value} sq.ft.` : (inst.posture ? inst.posture : (inst.mode ? `${inst.mode}` : 'N/A'))))
+                                                instance.split('.')[0] === 'sound_maps' ? `${inst.average} dB` : (inst.value && (inst.kind === 'Construction' || inst.kind === 'Constructed') ? `${inst.value} ft` : (inst.value && inst.kind ? `${inst.value} ft\u00B2` : (inst.posture ? inst.posture : (inst.mode ? `${inst.mode}` : 'N/A'))))
                                             }
                                         </TableCell>
                                         <TableCell>
@@ -230,15 +299,13 @@ Row.propTypes = {
     row: PropTypes.shape({}).isRequired,
 };
 
-function ActivityTable(props) {
+export default function ActivityTable(props) {
     /* Nested Expandable Tables */
     const activityRow = props.activity;
 
     return(
             props.type === 0 ? (Object.entries(activityRow).map(([type, obj]) => (
-                <Row key={ type } name={ type } row={ obj } />
-            ))) : subtable(activityRow, 1, '')
+                <Row key={ type } name={ type } row={ obj } open={props.open}/>
+            ))) : subtable(activityRow, 1, '', '')
     );
 }
-
-export default ActivityTable;

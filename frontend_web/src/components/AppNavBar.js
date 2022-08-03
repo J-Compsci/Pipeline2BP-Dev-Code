@@ -1,5 +1,6 @@
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
+import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Toolbar from '@mui/material/Toolbar';
@@ -20,24 +21,26 @@ import logo1 from '../images/PtBPLogo.png';
 const settings = [
     {
         page: 'Account',
-        route: 'settings'
+        route: 'account'
     },
     {
         page: 'Logout',
         route: '/'
-
     }
 ];
 
-//SVG Home icon link button
-const home = <Link className='homeButton' to='/home'><Image src={logo1} className='icon-shadow' alt='logo' height='50px'/></Link>;
-
+// Updates state for token in session on refresh, back, 
 const AppNavBar = (props) => {
     const location = useLocation();
     const segment = location.pathname.split('/');
 
-    //console.log('AppNavBar');
-    //console.log(location.state.userToken.user);
+    if(!location.state){
+        location.state = {}
+        location.state.userToken = props.passToken;
+    }
+
+
+    const invites = location?.state?.userToken?.user?.invites.length;
     
     const userName = {
         fN: location.state?.userToken?.user.firstname ? location.state?.userToken?.user.firstname : 'Abc',
@@ -73,12 +76,14 @@ const AppNavBar = (props) => {
         var path = '';
         for (i = 1; i <= index; i++){
             path = `${path}/${segment[i]}`;
-            //console.log(segment[i]+' '+index);
         }
-        //console.log(path);
         return(path);
     }
 
+    //SVG Home icon link button
+    const home = <Link className='homeButton' to='/home' state={location.state}><Image src={logo1} className='icon-shadow' alt='logo' height='50px' /></Link>;
+
+    // Alternate versions for different screen widths
     return (
         <AppBar position='static'>
             <Container maxWidth='xl'>
@@ -125,10 +130,10 @@ const AppNavBar = (props) => {
                                     <MenuItem 
                                         key={ page } 
                                         component={ Link }
-                                        to={ segmentLink(page === 'teams' || page === 'projects' ? index + 1 : index)}
+                                        to={ segmentLink(page === 'teams' || page === 'projects' || page === 'edit' ? index + 1 : index)}
                                         state={ location.state }
                                         onClick={ handleCloseNavMenu }>
-                                        <Typography textAlign='center'> {page === 'teams' ? 'Projects' : (page === 'projects' ? 'Project Page' : (`${page.charAt(0).toUpperCase()}${page.slice(1)}`))} </Typography>
+                                        <Typography textAlign='center'> {page === 'teams' ? 'Projects' : (page === 'projects' ? 'Project Page' : `${page.charAt(0).toUpperCase()}${page.slice(1)}`)} </Typography>
                                     </MenuItem>
                                 : null
                             )) }
@@ -146,7 +151,7 @@ const AppNavBar = (props) => {
                             !/\d/.test(page) && page !== 'form' && page !== 'area' && page !== 'points' && page !== ':id' && index > 0 ? 
                             <Button
                                 component={ Link }
-                                to={ segmentLink(page === 'teams'  || page === 'projects' ? index+1 : index) }
+                                to={segmentLink(page === 'teams' || page === 'projects' || page === 'edit' ? index+1 : index) }
                                 state={ location.state }
                                 key={ page }
                                 onClick={ handleCloseNavMenu }
@@ -158,13 +163,21 @@ const AppNavBar = (props) => {
                         )) }
                     </Box>
                     <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title='Open settings'>
-                            <IconButton onClick={ handleOpenUserMenu } sx={{ p: 0 }}>
-                                <Avatar>{`${userName.fN[0]}${userName.lN[0]}`}</Avatar>
-                            </IconButton>
+                        <Tooltip title='Open Menu'>
+                            {invites > 0 ?
+                                <Badge badgeContent={invites} color='error'>
+                                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                        <Avatar>{`${userName.fN[0]}${userName.lN[0]}`}</Avatar>
+                                    </IconButton>
+                                </Badge>
+                                : 
+                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                    <Avatar>{`${userName.fN[0]}${userName.lN[0]}`}</Avatar>
+                                </IconButton>
+                            }
                         </Tooltip>
                         <Menu
-                            sx={{ mt: '45px' }}
+                            sx={{ mt: '45px', zIndex: 'tooltip' }}
                             id='menu-appbar'
                             anchorEl={ anchorElUser }
                             anchorOrigin={{
@@ -189,7 +202,7 @@ const AppNavBar = (props) => {
                                 >
                                     <Typography textAlign='center'>{ setting.page }</Typography>
                                 </MenuItem>
-                            )) }
+                            ))}
                         </Menu>
                     </Box>
                 </Toolbar>
